@@ -1,0 +1,18 @@
+alias
+all
+ansi
+ansi gradient
+ansi strip
+any
+append
+ast
+benchmark
+bits
+bits and
+bits not
+bits or
+bits rol
+bits ror
+bits shl
+bits shr
+bits xor
