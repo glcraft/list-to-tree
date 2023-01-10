@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use clap::Parser;
 
 #[derive(clap::Parser, Debug)]
@@ -11,35 +9,70 @@ struct Args {
 }
 
 #[derive(Debug)]
-enum Node<'a> {
-    Leaf(Vec<&'a str>),
-    Branch(HashMap<&'a str, Node<'a>>),
+enum Node {
+    Leaf(String),
+    Branch(String, Vec<Node>),
 }
-impl<'a> Node<'a> {
-    fn find_difference(a: &'a str, b: &'a str) -> usize {
-        assert_ne!(a, b, "List elements not distinct");
-        a.chars()
-            .zip(b.chars())
-            .enumerate()
-            .find(|(_, (a, b))| a != b)
-            .map(|(i, _)| i)
-            .or(Some(a.len()))
-        
+impl Node {
+    fn partition_length<Str: AsRef<str>, It: Iterator<Item=Str>+Clone>(mut it: It, offset: usize) -> Option<usize> {
+        let first_char = match it.next().unwrap().as_ref().chars().nth(offset) {
+            Some(c) => c,
+            None => return None,
+        };
+        let result = it.enumerate()
+            .find(|(_, word)|{
+                match word.as_ref().chars().nth(offset) {
+                    Some(c) => c != first_char,
+                    None => true,
+                }
+            })
+            .map(|(i, _)| i+1)
+            .expect("List elements not distinct");
+        Some(result)
     }
-    fn is_similar_from(a: &'a str, b: &'a str, diff: usize) -> bool {
-        a.chars()
-            .zip(b.chars())
-            .skip(diff)
-            .all(|(a, b)| a == b)
-    }
-    fn make<It: Iterator<Item=(&'a str, &'a str)>>(&mut self, mut it: It) {
-        if let Some((a, b)) = it.next() {
-            let diff = Self::find_difference(a, b);
-            let (a, b) = a.split_at(diff);
-            let mut map = HashMap::new();
-            map.insert(b, Node::Leaf(vec![a]));
-            self.make(it);
-            *self = Node::Branch(map);
+    fn make<Str: AsRef<str>, It: Iterator<Item=Str>+Clone>(mut it: It, offset: usize) -> (usize, Option<Self>) {
+        let mut nchar = offset;
+        let size = Self::partition_length(it.clone(), offset).unwrap();
+        assert!(size > 0, "Empty list");
+        if size == 1 {
+            let word = it.next().unwrap().as_ref().to_string();
+            return (1, Some(Node::Leaf(word)));
+        }
+        nchar+=1;
+        loop {
+            match Self::partition_length(it.clone(), nchar) {
+                Some(n) if n == size => {},
+                _ => break,
+            }
+            nchar+=1;
+        }
+        match size {
+            0..=1 => {
+                unreachable!("Empty list")
+            }
+            size => {
+                let word = it.clone().next()
+                    .unwrap()
+                    .as_ref()
+                    .chars()
+                    .skip(offset)
+                    .take(nchar - offset)
+                    .collect::<String>();
+                let mut children = Vec::new();
+                let mut i = 0;
+                while i < size {
+                    let (n, child) = Self::make(it.clone(), nchar);
+                    i += n;
+                    for _ in 0..n {
+                        it.next();
+                    }
+                    if let Some(child) = child {
+                        children.push(child);
+                    }
+                }
+                
+                (size, Some(Node::Branch(word, children)))
+            }
         }
     }
 }
@@ -49,6 +82,6 @@ fn main() {
     let list_str = std::fs::read_to_string(&args.file).expect("Unable to read file");
     let mut list = list_str.lines().collect::<Vec<_>>();
     list.sort();
-    let mut root = Node::new("");
+    let mut root = Node::make(list.iter(), 0).1.unwrap();
     println!("{:#?}", root);
 }
