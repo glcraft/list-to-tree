@@ -13,13 +13,19 @@ enum Node {
     Leaf(String),
     Branch(String, Vec<Node>),
 }
+enum PartitionSize {
+    None,
+    Many(usize),
+    All,
+}
 impl Node {
-    fn partition_length<Str: AsRef<str>, It: Iterator<Item=Str>+Clone>(mut it: It, offset: usize) -> Option<usize> {
+    fn partition_size<Str: AsRef<str>, It: Iterator<Item=Str>+Clone>(mut it: It, offset: usize) -> Option<usize> {
+        let total = it.clone().count();
         let first_char = match it.next().unwrap().as_ref().chars().nth(offset) {
             Some(c) => c,
-            None => return None,
+            None => return Some(total),
         };
-        let result = it.enumerate()
+        it.enumerate()
             .find(|(_, word)|{
                 match word.as_ref().chars().nth(offset) {
                     Some(c) => c != first_char,
@@ -27,20 +33,28 @@ impl Node {
                 }
             })
             .map(|(i, _)| i+1)
-            .expect("List elements not distinct");
-        Some(result)
+            .or(None)
     }
-    fn make<Str: AsRef<str>, It: Iterator<Item=Str>+Clone>(mut it: It, offset: usize) -> (usize, Option<Self>) {
+    fn make<Str>(list: &[Str], offset: usize) -> (usize, Option<Self>) 
+        where Str: AsRef<str>
+    {
         let mut nchar = offset;
-        let size = Self::partition_length(it.clone(), offset).unwrap();
+        if list.len() == 1 {
+            let word = list[0].as_ref()
+                .chars()
+                .skip(offset)
+                .collect::<String>();
+            return (1, Some(Node::Leaf(word)));
+        }
+        let size = Self::partition_size(list.iter(), offset).unwrap();
         assert!(size > 0, "Empty list");
         if size == 1 {
-            let word = it.next().unwrap().as_ref().to_string();
+            let word = list[0].as_ref().to_string();
             return (1, Some(Node::Leaf(word)));
         }
         nchar+=1;
         loop {
-            match Self::partition_length(it.clone(), nchar) {
+            match Self::partition_size(list.iter(), nchar) {
                 Some(n) if n == size => {},
                 _ => break,
             }
@@ -51,7 +65,7 @@ impl Node {
                 unreachable!("Empty list")
             }
             size => {
-                let word = it.clone().next()
+                let word = list.iter().next()
                     .unwrap()
                     .as_ref()
                     .chars()
@@ -61,16 +75,12 @@ impl Node {
                 let mut children = Vec::new();
                 let mut i = 0;
                 while i < size {
-                    let (n, child) = Self::make(it.clone(), nchar);
+                    let (n, child) = Self::make(&list[i..size], nchar);
                     i += n;
-                    for _ in 0..n {
-                        it.next();
-                    }
                     if let Some(child) = child {
                         children.push(child);
                     }
                 }
-                
                 (size, Some(Node::Branch(word, children)))
             }
         }
@@ -82,6 +92,6 @@ fn main() {
     let list_str = std::fs::read_to_string(&args.file).expect("Unable to read file");
     let mut list = list_str.lines().collect::<Vec<_>>();
     list.sort();
-    let mut root = Node::make(list.iter(), 0).1.unwrap();
+    let mut root = Node::make(list.as_slice(), 0).1.unwrap();
     println!("{:#?}", root);
 }
