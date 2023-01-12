@@ -1,0 +1,29 @@
+alias
+break
+continue
+def
+def-env
+export
+export alias
+export def
+export def-env
+export extern
+export use
+extern
+for
+hide
+if
+let
+loop
+module
+mut
+overlay
+overlay hide
+overlay new
+overlay use
+register
+return
+source
+try
+use
+while

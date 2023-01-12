@@ -16,3 +16,6 @@ bits ror
 bits shl
 bits shr
 bits xor
+def
+def-env
+define
