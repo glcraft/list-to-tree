@@ -1,5 +1,5 @@
 [package]
-name = "list-to-regex"
+name = "list-to-tree"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.0", features=["derive"] }
+smartstring = "1.0"
