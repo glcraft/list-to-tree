@@ -1,10 +1,20 @@
 use smartstring::alias::String;
 
-
+/// A node of words
+/// 
+/// Words are splitted into branches and leaves. This means that to get a full word, you need to
+/// concatenate the word of the node with the words of its children until you reach a leaf. There
+/// is one exception with BranchIncluded nodes, which the word is a leaf and is needed to compose
+/// words with its children.
 #[derive(Debug)]
 pub enum Node {
+    /// A leaf node, containing a word
     Leaf(String),
+    /// A branch node, containing a word and a list of children
+    /// The word itself is not contained in the list. It is used to compose words with the children
     Branch(String, Vec<Node>),
+    /// A branch node, containing a word and a list of children
+    /// The word itself is contained in the list. It is also used to compose words with the children
     BranchIncluded(String, Vec<Node>),
 }
 enum PartitionSize {
@@ -85,6 +95,7 @@ impl Node {
             size => (size, Self::make_branch(&list[0..size], offset))
         }
     }
+    /// Generate a tree from a list of words
     pub fn new<Str>(list: &[Str]) -> Self
         where Str: AsRef<str>
     {

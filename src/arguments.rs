@@ -8,6 +8,7 @@ pub enum Formatter {
     Rust,
 }
 
+/// Argument model for the command line interface.
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Args {
