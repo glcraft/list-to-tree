@@ -4,9 +4,6 @@ use crate::node::Node;
 pub struct Regex(pub String);
 
 impl Regex {
-    pub fn new(regex: &str) -> Self {
-        Self(regex.to_string())
-    }
     fn push_from_node(str: &mut String, node: &Node) {
         match node {
             Node::Leaf(word) => {
