@@ -44,12 +44,13 @@ impl Node {
         where Str: AsRef<str>
     {
         let mut nchar = offset;
-        loop {
+        let skip_word = loop {
             match Self::partition_size(list.iter(), nchar) {
                 PartitionSize::None => nchar+=1,
-                _ => break,
+                PartitionSize::All => break 1,
+                _ => break 0,
             }
-        }
+        };
         let word = list[0]
             .as_ref()
             .chars()
@@ -57,7 +58,7 @@ impl Node {
             .take(nchar - offset)
             .collect::<String>();
         let (mut i, mut children) = if word == "" {
-            (1, vec![Node::Leaf(String::new())])
+            (skip_word, vec![Node::Leaf(String::new())])
         } else {
             (0, Vec::new())
         };
