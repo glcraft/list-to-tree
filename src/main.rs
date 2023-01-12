@@ -24,7 +24,6 @@ fn main() {
         None => Box::new(std::io::stdout())
     };
     let output = match args.format {
-        arguments::Formatter::Json => "Work in progress".to_string(),
         arguments::Formatter::Regex => regex::Regex::from(root).0,
         arguments::Formatter::Rust => if args.pretty {
             format!("{:#?}", root)
