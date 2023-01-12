@@ -1,1 +1,1 @@
-alias|break|continue|def(?:(?:-env))|ex(?:port(?:(?: (?:alias|def(?:(?:-env))|extern|use)))|tern)|for|hide|if|l(?:et|oop)|m(?:odule|ut)|overlay(?:(?: (?:hide|new|use)))|re(?:gister|turn)|source|try|use|whil
+alias|break|continue|def(?:-env)?|ex(?:port(?: (?:alias|def(?:-env)?|extern|use))?|tern)|for|hide|if|l(?:et|oop)|m(?:odule|ut)|overlay(?: (?:hide|new|use))?|re(?:gister|turn)|source|try|use|while
