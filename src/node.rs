@@ -5,6 +5,7 @@ use smartstring::alias::String;
 pub enum Node {
     Leaf(String),
     Branch(String, Vec<Node>),
+    BranchIncluded(String, Vec<Node>),
 }
 enum PartitionSize {
     None,
@@ -57,14 +58,15 @@ impl Node {
             .skip(offset)
             .take(nchar - offset)
             .collect::<String>();
-        let (mut i, mut children) = if word == "" {
-            (skip_word, vec![Node::Leaf(String::new())])
-        } else {
-            (0, Vec::new())
-        };
+        let mut i = if word == "" { skip_word } else { 0 };
+        let mut children = Vec::new();
         while i < list.len() {
             let (n, child) = Self::make(&list[i..list.len()], nchar);
             i += n;
+            let child = match child {
+                Node::Branch(current_word, current_children) if current_word == "" => return Self::BranchIncluded(word, current_children),
+                child => child,
+            };
             children.push(child);
         }
         Node::Branch(word, children)
