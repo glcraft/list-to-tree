@@ -1,8 +1,44 @@
 # list-to-tree
 
-Convert list of words into a tree. 
+Convert list of text separated by line into a tree. 
 
-Each repetition in words are branched into list of branches or leaf to make the list optimized for storage or research. 
+Each repetition in slice of text are detected and branched into list of branches or leaf to make the list optimized for storage or research.
+
+For example, let say wi have this list :
+```
+all
+alias
+abra
+abro
+```
+The output `list-to-tree --format rust --pretty` will be 
+```
+Branch(
+    "a",
+    [
+        Branch(
+            "br",
+            [
+                Leaf(
+                    "a",
+                ),
+                Leaf(
+                    "o",
+                ),
+            ],
+            "l",
+            [
+                Leaf(
+                    "ias",
+                ),
+                Leaf(
+                    "l",
+                ),
+            ],
+        ),
+    ],
+)
+```
 
 The program was first designed to make big optimized regex of keywords for TextMate grammar (used in the [nushell vscode extension](https://github.com/nushell/vscode-nushell-lang))
 
