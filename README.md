@@ -4,7 +4,26 @@ Convert list of text separated by line into a tree.
 
 Each repetition in slice of text are detected and branched into list of branches or leaf to make the list optimized for storage or research.
 
-For example, let say wi have this list :
+The program was first designed to make big optimized regex of keywords for TextMate grammar (used in the [nushell vscode extension](https://github.com/nushell/vscode-nushell-lang))
+
+## Usage
+
+```
+list-to-tree <--format <Format>> [--input <path>] [--output <path>] [--pretty] 
+```
+
+### Parameters
+
+- `format` : Format of the output. Possible value :
+  - `regex` : Output the tree into a regex
+  - `rust` : Output the tree into rust ast
+- `input` : Path to the file containing the list of words. Default to stdin
+- `output` : Path to the file where the output will be written. Default to stdout
+- `pretty` : Pretty print the output (for `rust` format). Default to false
+
+## Example
+
+Let say we have this list in input :
 ```
 all
 alias
@@ -39,23 +58,11 @@ Branch(
     ],
 )
 ```
-
-The program was first designed to make big optimized regex of keywords for TextMate grammar (used in the [nushell vscode extension](https://github.com/nushell/vscode-nushell-lang))
-
-## Usage
+And here is the result for `list-to-tree --format regex`
 
 ```
-list-to-tree <--format <Format>> [--input <path>] [--output <path>] [--pretty] 
+a(?:br(?:a|o)|l(?:ias|l))
 ```
-
-### Parameters
-
-- `format` : Format of the output. Possible value :
-  - `regex` : Output the tree into a regex
-  - `rust` : Output the tree into rust ast
-- `input` : Path to the file containing the list of words. Default to stdin
-- `output` : Path to the file where the output will be written. Default to stdout
-- `pretty` : Pretty print the output (for `rust` format). Default to false
 
 ## Build
 
