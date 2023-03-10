@@ -18,6 +18,7 @@ fn main() {
     };
     let mut list = list_str.lines().collect::<Vec<_>>();
     list.sort();
+    list.dedup();
     let root = node::Node::new(list.as_slice());
     let mut file : Box<dyn Write> = match args.output {
         Some(path) => Box::new(std::fs::File::create(path).expect("Unable to create file")),
